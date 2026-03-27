@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <string.h>
+#include "commands.h"
+
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        printf("Run lxt help\n");
+        return 1;
+    }
+
+    if (strcmp(argv[1], "help") == 0) {
+        help_view();
+        return 0;
+    }
+
+    if (strcmp(argv[1], "new") == 0) {
+        if (argc < 3) {
+            printf("Usage: lxt new <name> [--no-include]\n");
+            return 1;
+        }
+
+        const char *name = argv[2];
+        int no_include = 0;
+
+        for (int i = 3; i < argc; i++) {
+            if (strcmp(argv[i], "--no-include") == 0) {
+                no_include = 1;
+            }
+        }
+
+        new_project(name, no_include);
+        return 0;
+    }
+
+    if (strcmp(argv[1], "init") == 0) {
+        int no_include = 0;
+
+        for (int i = 2; i < argc; i++) {
+            if (strcmp(argv[i], "--no-include") == 0) {
+                no_include = 1;
+            }
+        }
+
+        init_project(no_include);
+        return 0;
+    }
+
+    if (strcmp(argv[1], "build") == 0) {
+        build_project();
+    }
+
+    if (strcmp(argv[1], "clean") == 0) {
+        int all = 0;
+
+        for (int i = 2; i < argc; i++) {
+            if (strcmp(argv[i], "--all") == 0) {
+                all = 1;
+            }
+        }
+
+        if (all)
+            clean_all();
+        else
+            clean_project();
+        return 0;
+    }
+
+    printf("Unknown command: %s\n", argv[1]);
+    return 1;
+}
