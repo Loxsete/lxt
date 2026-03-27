@@ -52,6 +52,11 @@ int main(int argc, char *argv[]) {
         build_project();
     }
 
+	if (strcmp(argv[1], "run") == 0) {
+        run_project(argc, argv);
+        return 0;
+    }
+
     if (strcmp(argv[1], "clean") == 0) {
         int all = 0;
 

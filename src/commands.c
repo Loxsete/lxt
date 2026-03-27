@@ -1,4 +1,5 @@
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -53,7 +54,8 @@ void help_view(void) {
     printf("  init [--no-include]      Init project in current directory\n");
     printf("  build                    Build project using make\n");
     printf("  clean                    Remove build files\n");
-    printf("  clean --all              Remove ALL project files\n\n");
+    printf("  clean --all              Remove ALL project files\n");
+    printf("  run                      Build and run project\n\n");
 
     printf("Options:\n");
     printf("  --no-include             Do not create include/ directory\n");
@@ -66,6 +68,7 @@ void help_view(void) {
     printf("  lxt new myproj --template cpp\n");
     printf("  lxt init\n");
     printf("  lxt build\n");
+    printf("  lxt run\n");
     printf("  lxt clean\n");
     printf("  lxt clean --all\n");
 }
@@ -108,4 +111,26 @@ void clean_all(void) {
     remove_directory("include");
     remove("Makefile");
     printf("Full clean done\n");
+}
+
+void run_project(int argc, char *argv[]) {
+    pid_t pid = fork();
+
+    if (pid == 0) {
+        execlp("make", "make", NULL);
+        perror("make");
+        exit(1);
+    } else if (pid > 0) {
+        int status;
+        waitpid(pid, &status, 0);
+
+        if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+            execv("./bin/app", argv);
+            perror("run");
+        } else {
+            printf("Build failed\n");
+        }
+    } else {
+        perror("fork");
+    }
 }
