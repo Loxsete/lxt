@@ -7,6 +7,40 @@
 #include "build.h"
 #include "utils.h"
 
+static void create_template(const char *lang) {
+    if (!lang) return;
+
+    FILE *f = fopen("src/main.c", "w");
+    if (!f) {
+        perror("fopen");
+        return;
+    }
+
+    if (strcmp(lang, "c") == 0) {
+        fprintf(f, "#include <stdio.h>\n\n");
+        fprintf(f, "int main(int argc, char *argv[]) {\n");
+        fprintf(f, "    return 0;\n");
+        fprintf(f, "}\n");
+    } else if (strcmp(lang, "cpp") == 0) {
+        fprintf(f, "#include <iostream>\n\n");
+        fprintf(f, "int main(int argc, char *argv[]) {\n");
+        fprintf(f, "    return 0;\n");
+        fprintf(f, "}\n");
+    } else {
+        printf("Unknown template: %s\n", lang);
+    }
+
+    fclose(f);
+}
+
+static void create_structure(int no_include, const char *tmpl) {
+    mkdir("src", 0755);
+    if (!no_include)
+        mkdir("include", 0755);
+    create_makefile(no_include);
+    create_template(tmpl);
+}
+
 void help_view(void) {
     printf("lxt - project manager\n\n");
 
@@ -22,26 +56,21 @@ void help_view(void) {
     printf("  clean --all              Remove ALL project files\n\n");
 
     printf("Options:\n");
-    printf("  --no-include             Do not create include/ directory\n\n");
+    printf("  --no-include             Do not create include/ directory\n");
+    printf("  --template <lang>        Generate main file (c, cpp)\n\n");
 
     printf("Examples:\n");
     printf("  lxt new myproj\n");
     printf("  lxt new myproj --no-include\n");
+    printf("  lxt new myproj --template c\n");
+    printf("  lxt new myproj --template cpp\n");
     printf("  lxt init\n");
     printf("  lxt build\n");
     printf("  lxt clean\n");
     printf("  lxt clean --all\n");
 }
 
-static void create_structure(int no_include) {
-    mkdir("src", 0755);
-    if (!no_include) {
-        mkdir("include", 0755);
-    }
-    create_makefile(no_include);
-}
-
-void new_project(const char *name, int no_include) {
+void new_project(const char *name, int no_include, const char *tmpl) {
     if (mkdir(name, 0755) != 0) {
         perror("mkdir");
         return;
@@ -52,12 +81,12 @@ void new_project(const char *name, int no_include) {
         return;
     }
 
-    create_structure(no_include);
+    create_structure(no_include, tmpl);
     printf("Project '%s' created\n", name);
 }
 
-void init_project(int no_include) {
-    create_structure(no_include);
+void init_project(int no_include, const char *tmpl) {
+    create_structure(no_include, tmpl);
     printf("Project initialized\n");
 }
 

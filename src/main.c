@@ -14,34 +14,37 @@ int main(int argc, char *argv[]) {
     }
 
     if (strcmp(argv[1], "new") == 0) {
-        if (argc < 3) {
-            printf("Usage: lxt new <name> [--no-include]\n");
-            return 1;
-        }
-
+        if (argc < 3) { printf("Usage: lxt new <name> [--no-include] [--template <lang>]\n"); return 1; }
+    
         const char *name = argv[2];
         int no_include = 0;
-
+        const char *tmpl = NULL;
+    
         for (int i = 3; i < argc; i++) {
             if (strcmp(argv[i], "--no-include") == 0) {
                 no_include = 1;
+            } else if (strcmp(argv[i], "--template") == 0 && i + 1 < argc) {
+                tmpl = argv[++i];
             }
         }
-
-        new_project(name, no_include);
+    
+        new_project(name, no_include, tmpl);
         return 0;
     }
-
+    
     if (strcmp(argv[1], "init") == 0) {
         int no_include = 0;
-
+        const char *tmpl = NULL;
+    
         for (int i = 2; i < argc; i++) {
             if (strcmp(argv[i], "--no-include") == 0) {
                 no_include = 1;
+            } else if (strcmp(argv[i], "--template") == 0 && i + 1 < argc) {
+                tmpl = argv[++i];
             }
         }
-
-        init_project(no_include);
+    
+        init_project(no_include, tmpl);
         return 0;
     }
 
